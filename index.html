@@ -7,14 +7,14 @@
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body {
-      margin: 0; padding: 24px; background: #0f172a; color: #f1f5f9;
+      margin: 0; padding: 20px; background: #0f172a; color: #f1f5f9;
       display: flex; justify-content: center;
     }
     .container {
       width: 100%; max-width: 820px; background: #1e293b;
-      padding: 24px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      padding: 20px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
-    h1 { margin-top: 0; font-size: 1.5rem; text-align: center; color: #38bdf8; }
+    h1 { margin-top: 0; font-size: 1.4rem; text-align: center; color: #38bdf8; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
     .card {
@@ -28,7 +28,7 @@
     .preview-wrap {
       display: flex; justify-content: center; align-items: center;
       background: #020617; border-radius: 10px; padding: 12px; margin-bottom: 16px;
-      min-height: 220px; border: 1px dashed #334155;
+      min-height: 200px; border: 1px dashed #334155;
     }
     #videoCanvas {
       max-width: 100%; max-height: 360px; border-radius: 6px; background: #000;
@@ -38,22 +38,23 @@
       display: block; margin-bottom: 12px; border: 1px solid #334155;
     }
     .time-controls {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;
     }
     .range-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .range-row span { min-width: 75px; font-size: 0.85rem; color: #94a3b8; }
+    .range-row span { min-width: 70px; font-size: 0.85rem; color: #94a3b8; }
     input[type="range"] { flex: 1; accent-color: #38bdf8; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
     button, .download-btn {
-      flex: 1; min-width: 140px; padding: 11px 16px; border: none; border-radius: 8px;
-      font-weight: 600; font-size: 0.95rem; cursor: pointer; text-align: center;
+      flex: 1; min-width: 130px; padding: 11px 14px; border: none; border-radius: 8px;
+      font-weight: 600; font-size: 0.92rem; cursor: pointer; text-align: center;
       text-decoration: none; transition: opacity 0.2s;
     }
     button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-full { background: #8b5cf6; color: #fff; }
     .btn-preview { background: #3b82f6; color: #fff; }
     .btn-stop { background: #ef4444; color: #fff; }
-    .btn-render { background: #10b981; color: #fff; }
-    .download-btn { background: #f59e0b; color: #0f172a; display: inline-block; }
+    .btn-render { background: #10b981; color: #fff; width: 100%; flex-basis: 100%; }
+    .download-btn { background: #f59e0b; color: #0f172a; display: block; width: 100%; }
     .progress-box { margin-top: 14px; display: none; }
     .progress-bar {
       width: 100%; height: 10px; background: #0f172a; border-radius: 99px; overflow: hidden;
@@ -68,7 +69,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Ghép MP3 vào Ảnh tạo Video</h1>
+    <h1>Ghép Nhạc vào Ảnh tạo Video</h1>
 
     <div class="grid">
       <div class="card">
@@ -84,9 +85,10 @@
       </div>
 
       <div class="card">
-        <label for="audioInput">2. Chọn file âm thanh (MP3, WAV...)</label>
-        <input type="file" id="audioInput" accept="audio/*" />
-        <div id="audioInfo" style="margin-top: 12px; font-size: 0.85rem; color: #94a3b8;">
+        <label for="audioInput">2. Chọn file âm thanh (MP3, WAV, M4A...)</label>
+        <!-- Đã bỏ accept="audio/*" để iOS/iPhone chọn được mọi file nhạc -->
+        <input type="file" id="audioInput" />
+        <div id="audioInfo" style="margin-top: 12px; font-size: 0.85rem; color: #94a3b8; word-break: break-word;">
           Chưa tải file âm thanh.
         </div>
       </div>
@@ -111,22 +113,23 @@
 
       <div class="time-controls">
         <div>
-          <label for="startTime">Bắt đầu (giây)</label>
+          <label for="startTime">Bắt đầu (s)</label>
           <input type="number" id="startTime" min="0" step="0.1" value="0" disabled />
         </div>
         <div>
-          <label for="endTime">Kết thúc (giây)</label>
+          <label for="endTime">Kết thúc (s)</label>
           <input type="number" id="endTime" min="0" step="0.1" value="0" disabled />
         </div>
         <div>
-          <label>Thời lượng cắt</label>
+          <label>Độ dài cắt</label>
           <input type="text" id="clipDuration" value="0.0s" readonly style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#38bdf8;font-weight:bold;" />
         </div>
       </div>
 
       <div class="actions">
-        <button id="previewBtn" class="btn-preview" disabled>▶ Nghe thử đoạn chọn</button>
-        <button id="stopBtn" class="btn-stop" disabled>■ Dừng nghe</button>
+        <button id="previewFullBtn" class="btn-full" disabled>▶ Nghe toàn bài</button>
+        <button id="previewBtn" class="btn-preview" disabled>▶ Nghe đoạn cắt</button>
+        <button id="stopBtn" class="btn-stop" disabled>■ Dừng</button>
         <button id="renderBtn" class="btn-render" disabled>🎬 Tạo Video</button>
       </div>
 
@@ -138,7 +141,7 @@
 
     <div class="result-box card" id="resultBox">
       <label>Video đã tạo xong:</label>
-      <video id="resultVideo" controls></video>
+      <video id="resultVideo" controls playsinline></video>
       <a id="downloadLink" class="download-btn" download="video.mp4">⬇ Tải Video về máy</a>
     </div>
   </div>
@@ -159,6 +162,7 @@
     const clipDurationInput = document.getElementById('clipDuration');
     const audioInfo = document.getElementById('audioInfo');
 
+    const previewFullBtn = document.getElementById('previewFullBtn');
     const previewBtn = document.getElementById('previewBtn');
     const stopBtn = document.getElementById('stopBtn');
     const renderBtn = document.getElementById('renderBtn');
@@ -229,11 +233,9 @@
         videoCanvas.height = targetH;
       }
 
-      // Nền đen
       vCtx.fillStyle = '#000000';
       vCtx.fillRect(0, 0, targetW, targetH);
 
-      // Vẽ ảnh vừa khung (contain) không bị méo
       const imgRatio = loadedImage.width / loadedImage.height;
       const canvasRatio = targetW / targetH;
       let drawW, drawH, offsetX, offsetY;
@@ -252,7 +254,7 @@
       vCtx.drawImage(loadedImage, offsetX, offsetY, drawW, drawH);
     }
 
-    // 2. Xử lý MP3 & vẽ Waveform
+    // 2. Xử lý file âm thanh & vẽ Waveform
     audioInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -279,10 +281,11 @@
 
         updateClipDuration();
         drawWaveform();
+        previewFullBtn.disabled = false;
         previewBtn.disabled = false;
         checkReadyToRender();
       } catch (err) {
-        audioInfo.textContent = 'Lỗi: Không thể đọc file âm thanh này.';
+        audioInfo.textContent = 'Lỗi: Không thể đọc file này. Hãy chắc chắn đây là file âm thanh hợp lệ.';
         console.error(err);
       }
     });
@@ -365,37 +368,44 @@
       }
     }
 
-    // 3. Nghe thử đoạn cắt
-    previewBtn.addEventListener('click', () => {
-      if (!audioBuffer) return;
+    // 3. Hàm phát nghe thử (dùng chung cho Toàn bài & Đoạn cắt)
+    function playAudioSegment(startSec, durationSec) {
+      if (!audioBuffer || durationSec <= 0) return;
       stopPreview();
 
       const ctx = getAudioContext();
-      const start = parseFloat(startTimeInput.value);
-      const end = parseFloat(endTimeInput.value);
-      const duration = end - start;
-      if (duration <= 0) return;
-
       previewSource = ctx.createBufferSource();
       previewSource.buffer = audioBuffer;
       previewSource.connect(ctx.destination);
-      previewSource.start(0, start, duration);
+      previewSource.start(0, startSec, durationSec);
 
       previewStartCtxTime = ctx.currentTime;
       stopBtn.disabled = false;
 
       const updatePlayhead = () => {
         const elapsed = ctx.currentTime - previewStartCtxTime;
-        if (elapsed >= duration) {
+        if (elapsed >= durationSec) {
           stopPreview();
           return;
         }
-        drawWaveform(start + elapsed);
+        drawWaveform(startSec + elapsed);
         previewRaf = requestAnimationFrame(updatePlayhead);
       };
       previewRaf = requestAnimationFrame(updatePlayhead);
 
       previewSource.onended = () => stopPreview();
+    }
+
+    previewFullBtn.addEventListener('click', () => {
+      if (!audioBuffer) return;
+      playAudioSegment(0, audioBuffer.duration);
+    });
+
+    previewBtn.addEventListener('click', () => {
+      if (!audioBuffer) return;
+      const start = parseFloat(startTimeInput.value);
+      const end = parseFloat(endTimeInput.value);
+      playAudioSegment(start, end - start);
     });
 
     stopBtn.addEventListener('click', stopPreview);
@@ -418,7 +428,7 @@
       renderBtn.disabled = !(loadedImage && audioBuffer && !isRendering);
     }
 
-    // 4. Xuất Video (Canvas + Web Audio -> MediaRecorder)
+    // 4. Xuất Video
     renderBtn.addEventListener('click', async () => {
       if (!loadedImage || !audioBuffer || isRendering) return;
       stopPreview();
@@ -431,29 +441,26 @@
       isRendering = true;
       renderBtn.disabled = true;
       previewBtn.disabled = true;
+      previewFullBtn.disabled = true;
       resultBox.style.display = 'none';
       progressBox.style.display = 'block';
       progressFill.style.width = '0%';
-      statusText.textContent = `Đang tạo video (${duration.toFixed(1)} giây)... Vui lòng không đóng tab.`;
+      statusText.textContent = `Đang tạo video (${duration.toFixed(1)} giây)... Vui lòng không khóa màn hình.`;
 
       const ctx = getAudioContext();
       drawVideoFrame();
 
-      // Luồng hình ảnh từ Canvas (30fps)
       const canvasStream = videoCanvas.captureStream(30);
-      // Luồng âm thanh từ đoạn cắt
       const audioDest = ctx.createMediaStreamDestination();
       const source = ctx.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(audioDest);
 
-      // Gộp 2 luồng
       const combinedStream = new MediaStream([
         ...canvasStream.getVideoTracks(),
         ...audioDest.stream.getAudioTracks()
       ]);
 
-      // Chọn định dạng tốt nhất trình duyệt hỗ trợ
       const mimeTypes = [
         'video/mp4;codecs=avc1,mp4a.40.2',
         'video/mp4',
@@ -471,7 +478,6 @@
         if (e.data && e.data.size > 0) chunks.push(e.data);
       };
 
-      // Giữ Canvas vẽ lại liên tục để trình duyệt ghi đều khung hình
       const drawInterval = setInterval(() => drawVideoFrame(), 1000 / 30);
 
       const renderStartTime = performance.now();
@@ -498,13 +504,13 @@
 
         isRendering = false;
         previewBtn.disabled = false;
+        previewFullBtn.disabled = false;
         checkReadyToRender();
       };
 
       recorder.start(100);
       source.start(0, start, duration);
 
-      // Dừng ghi khi phát hết đoạn âm thanh cắt
       source.onended = () => {
         if (recorder.state !== 'inactive') recorder.stop();
       };
